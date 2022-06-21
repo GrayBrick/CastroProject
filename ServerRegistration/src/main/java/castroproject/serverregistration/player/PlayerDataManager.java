@@ -10,6 +10,7 @@ import org.bukkit.entity.Tadpole;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.jetbrains.annotations.NotNull;
 
 import javax.print.attribute.standard.MediaSize;
 import java.sql.PreparedStatement;
@@ -19,8 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class PlayerDataManager implements Manager, Listener
-{
+public class PlayerDataManager implements Manager {
 	private final ServerRegistration plugin;
 	public final HashMap<UUID, PlayerData> playerDatas = new HashMap();
 	public final String TABLE_NAME = "players";
@@ -32,30 +32,25 @@ public class PlayerDataManager implements Manager, Listener
 	private final String IP_NAME = "ip";
 	private final String FIRST_ENTER_NAME = "first_enter";
 
-	private final String ZERO_PASSWORD = "0";
+	public final String ZERO_PASSWORD = "0";
 
-	public PlayerDataManager(ServerRegistration plugin)
-	{
+	public PlayerDataManager(ServerRegistration plugin) {
 		this.plugin = plugin;
-		Bukkit.getPluginManager().registerEvents(this, this.plugin);
 		ini();
 		updateOnlinePlayers();
 	}
 
 	@Override
-	public void unloadManager()
-	{
+	public void unloadManager() {
 		saveAllPLayerDatasSync();
 	}
 
-	private void updateOnlinePlayers()
-	{
+	private void updateOnlinePlayers() {
 		for (Player player : Bukkit.getOnlinePlayers())
 			getPlayerData(player.getUniqueId());
 	}
 
-	private void ini()
-	{
+	private void ini() {
 		DataBaseManager dataBase = this.plugin.get(DataBaseManager.class);
 
 		dataBase.createTableIfNotExists(TABLE_NAME, UUID_NAME, COLUMN_PARAM);
@@ -65,20 +60,12 @@ public class PlayerDataManager implements Manager, Listener
 		dataBase.addColumnInTable(TABLE_NAME, FIRST_ENTER_NAME, "VARCHAR(45) NOT NULL");
 	}
 
-	@EventHandler
-	private void join(PlayerJoinEvent event)
+	public PlayerData getPlayerData(@NotNull Player player)
 	{
-		Player player = event.getPlayer();
-		PlayerData playerData = getPlayerData(player.getUniqueId());
-		if (playerData.password.equals(ZERO_PASSWORD))
-		{
-			playerData.getPlayer().sendMessage("Ты новенький)");
-			playerData.ip = player.getAddress().getHostName();
-		}
+		return getPlayerData(player.getUniqueId());
 	}
 
-	public PlayerData getPlayerData(UUID uuid)
-	{
+	public PlayerData getPlayerData(UUID uuid) {
 		if (this.playerDatas.containsKey(uuid)) return this.playerDatas.get(uuid);
 
 		try (PreparedStatement statement = this.plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(
@@ -106,26 +93,22 @@ public class PlayerDataManager implements Manager, Listener
 		}
 	}
 
-	public void saveAllPLayerDatasAsync()
-	{
+	public void saveAllPLayerDatasAsync() {
 		this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
 			() -> saveAllPLayerDatasSync());
 	}
 
-	public void saveAllPLayerDatasSync()
-	{
+	public void saveAllPLayerDatasSync() {
 		for (PlayerData playerData : this.playerDatas.values())
 			savePlayerDataSync(playerData);
 	}
 
-	public void savePlayerDataAsync(PlayerData playerData)
-	{
+	public void savePlayerDataAsync(PlayerData playerData) {
 		this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin,
 			() -> savePlayerDataSync(playerData));
 	}
 
-	public void savePlayerDataSync(PlayerData playerData)
-	{
+	public void savePlayerDataSync(PlayerData playerData) {
 		String insert = "INSERT INTO " + this.TABLE_NAME +
 			" (" + UUID_NAME + ", " + PASSWORD_NAME + ", " + NAME_NAME + ", " + IP_NAME + ", " + FIRST_ENTER_NAME + ") " +
 			" VALUES(?, ?, ?, ?, ?)" +
@@ -135,8 +118,7 @@ public class PlayerDataManager implements Manager, Listener
 			IP_NAME + " = ?, " +
 			FIRST_ENTER_NAME + " = ?";
 
-		try
-		{
+		try {
 			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
 
 			int counter = 0;
@@ -153,14 +135,12 @@ public class PlayerDataManager implements Manager, Listener
 			prSt.setString(++counter, String.valueOf(playerData.first_enter));
 
 			prSt.executeUpdate();
-		} catch (Exception ex)
-		{
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
-	private PlayerData createNewPlayerData(UUID uuid)
-	{
+	private PlayerData createNewPlayerData(UUID uuid) {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
 		PlayerData playerData = new PlayerData(
 			uuid,

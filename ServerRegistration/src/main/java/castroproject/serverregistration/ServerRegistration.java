@@ -3,6 +3,10 @@ package castroproject.serverregistration;
 import castroproject.common.Manager;
 import castroproject.common.sqlutils.DataBaseManager;
 import castroproject.serverregistration.player.PlayerDataManager;
+import castroproject.serverregistration.player.PlayerListenerManager;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
@@ -13,10 +17,17 @@ public final class ServerRegistration extends JavaPlugin {
 
 	private final Map<Class<? extends Manager>, Manager> managers = new LinkedHashMap<>();
 
+	public final Color JUST_COLOR = Color.fromBGR(194, 255, 202);
+	public final Color HIGHLIGHT_COLOR = Color.fromBGR(158, 255, 171);
+
+	public final TextColor JUST_COLOR_TEXT = TextColor.color(JUST_COLOR.getRed(), JUST_COLOR.getGreen(), JUST_COLOR.getBlue());
+	public final TextColor HIGHLIGHT_COLOR_TEXT = TextColor.color(HIGHLIGHT_COLOR.getRed(), HIGHLIGHT_COLOR.getGreen(), HIGHLIGHT_COLOR.getBlue());
+
 	@Override
 	public void onEnable() {
 		this.registerManager(new DataBaseManager());
 		this.registerManager(new PlayerDataManager(this));
+		this.registerManager(new PlayerListenerManager(this));
 	}
 
 	@Override
