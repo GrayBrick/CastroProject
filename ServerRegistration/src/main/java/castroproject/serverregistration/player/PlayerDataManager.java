@@ -39,12 +39,19 @@ public class PlayerDataManager implements Manager, Listener
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, this.plugin);
 		ini();
+		updateOnlinePlayers();
 	}
 
 	@Override
 	public void unloadManager()
 	{
 		saveAllPLayerDatasSync();
+	}
+
+	private void updateOnlinePlayers()
+	{
+		for (Player player : Bukkit.getOnlinePlayers())
+			getPlayerData(player.getUniqueId());
 	}
 
 	private void ini()
@@ -66,6 +73,7 @@ public class PlayerDataManager implements Manager, Listener
 		if (playerData.password.equals(ZERO_PASSWORD))
 		{
 			playerData.getPlayer().sendMessage("Ты новенький)");
+			playerData.ip = player.getAddress().getHostName();
 		}
 	}
 
@@ -74,7 +82,7 @@ public class PlayerDataManager implements Manager, Listener
 		if (this.playerDatas.containsKey(uuid)) return this.playerDatas.get(uuid);
 
 		try (PreparedStatement statement = this.plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(
-			"SELECT * FROM " + this.plugin.get(PlayerDataManager.class).TABLE_NAME + " WHERE uuid=?"
+			"SELECT * FROM " + this.TABLE_NAME + " WHERE uuid=?"
 		)) {
 			statement.setString(1, uuid.toString());
 
@@ -118,31 +126,37 @@ public class PlayerDataManager implements Manager, Listener
 
 	public void savePlayerDataSync(PlayerData playerData)
 	{
-//		String insert = "UPDATE " + this.TABLE_NAME + " SET " +
-//			PASSWORD_NAME + " = ?, " +
-//			NAME_NAME + " = ?, " +
-//			IP_NAME + " = ?, " +
-//			FIRST_ENTER_NAME + " = ? " +
-//			" WHERE (" + UUID_NAME + " = ?)";
-//
-//		try
-//		{
-//			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
-//
-//			int counter = 0;
-//
-//			prSt.setString(++counter, playerData.password);
-//			prSt.setString(++counter, playerData.name);
-//			prSt.setString(++counter, playerData.ip);
-//			prSt.setString(++counter, String.valueOf(playerData.first_enter));
-//
-//			prSt.setString(++counter, playerData.uuid.toString());
-//
-//			prSt.executeUpdate();
-//		} catch (Exception ex)
-//		{
-//			ex.printStackTrace();
-//		}
+		String insert = "INSERT INTO " + this.TABLE_NAME +
+			" (" + UUID_NAME + ", " + PASSWORD_NAME + ", " + NAME_NAME + ", " + IP_NAME + ", " + FIRST_ENTER_NAME + ") " +
+			" VALUES(?, ?, ?, ?, ?)" +
+			" ON DUPLICATE KEY UPDATE  " +
+			PASSWORD_NAME + " = ?, " +
+			NAME_NAME + " = ?, " +
+			IP_NAME + " = ?, " +
+			FIRST_ENTER_NAME + " = ?";
+
+		try
+		{
+			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
+
+			int counter = 0;
+
+			prSt.setString(++counter, playerData.uuid.toString());
+			prSt.setString(++counter, playerData.password);
+			prSt.setString(++counter, playerData.name);
+			prSt.setString(++counter, playerData.ip);
+			prSt.setString(++counter, String.valueOf(playerData.first_enter));
+
+			prSt.setString(++counter, playerData.password);
+			prSt.setString(++counter, playerData.name);
+			prSt.setString(++counter, playerData.ip);
+			prSt.setString(++counter, String.valueOf(playerData.first_enter));
+
+			prSt.executeUpdate();
+		} catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 
 	private PlayerData createNewPlayerData(UUID uuid)
@@ -156,36 +170,6 @@ public class PlayerDataManager implements Manager, Listener
 			new Date().getTime()
 		);
 		this.playerDatas.put(uuid, playerData);
-		//registrationPlayer(playerData);
 		return playerData;
 	}
-
-//	private void registrationPlayer(PlayerData playerData)
-//	{
-//		String insert = "INSERT INTO " + TABLE_NAME + "(" +
-//			UUID_NAME + "," +
-//			PASSWORD_NAME + "," +
-//			NAME_NAME + "," +
-//			IP_NAME + "," +
-//			FIRST_ENTER_NAME + ")" +
-//			"VALUES(?,?,?,?,?)";
-//
-//		try
-//		{
-//			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
-//
-//			int counter = 0;
-//
-//			prSt.setString(++counter, playerData.uuid.toString());
-//			prSt.setString(++counter, playerData.password);
-//			prSt.setString(++counter, playerData.name);
-//			prSt.setString(++counter, playerData.ip);
-//			prSt.setString(++counter, String.valueOf(playerData.first_enter));
-//
-//			prSt.executeUpdate();
-//		} catch (Exception ex)
-//		{
-//			ex.printStackTrace();
-//		}
-//	}
 }
