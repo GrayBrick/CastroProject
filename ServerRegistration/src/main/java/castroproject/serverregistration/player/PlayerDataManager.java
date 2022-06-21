@@ -120,31 +120,31 @@ public class PlayerDataManager implements Manager, Listener
 
 	public void savePlayerDataSync(PlayerData playerData)
 	{
-//		String insert = "UPDATE " + this.TABLE_NAME + " SET " +
-//			PASSWORD_NAME + " = ?, " +
-//			NAME_NAME + " = ?, " +
-//			IP_NAME + " = ?, " +
-//			FIRST_ENTER_NAME + " = ? " +
-//			" WHERE (" + UUID_NAME + " = ?)";
-//
-//		try
-//		{
-//			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
-//
-//			int counter = 0;
-//
-//			prSt.setString(++counter, playerData.password);
-//			prSt.setString(++counter, playerData.name);
-//			prSt.setString(++counter, playerData.ip);
-//			prSt.setString(++counter, String.valueOf(playerData.first_enter));
-//
-//			prSt.setString(++counter, playerData.uuid.toString());
-//
-//			prSt.executeUpdate();
-//		} catch (Exception ex)
-//		{
-//			ex.printStackTrace();
-//		}
+		String insert = "UPDATE " + this.TABLE_NAME + " SET " +
+			PASSWORD_NAME + " = ?, " +
+			NAME_NAME + " = ?, " +
+			IP_NAME + " = ?, " +
+			FIRST_ENTER_NAME + " = ? " +
+			" WHERE (" + UUID_NAME + " = ?)";
+
+		try
+		{
+			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
+
+			int counter = 0;
+
+			prSt.setString(++counter, playerData.password);
+			prSt.setString(++counter, playerData.name);
+			prSt.setString(++counter, playerData.ip);
+			prSt.setString(++counter, String.valueOf(playerData.first_enter));
+
+			prSt.setString(++counter, playerData.uuid.toString());
+
+			prSt.executeUpdate();
+		} catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 
 	private PlayerData createNewPlayerData(UUID uuid)
@@ -162,32 +162,32 @@ public class PlayerDataManager implements Manager, Listener
 		return playerData;
 	}
 
-//	private void registrationPlayer(PlayerData playerData)
-//	{
-//		String insert = "INSERT INTO " + TABLE_NAME + "(" +
-//			UUID_NAME + "," +
-//			PASSWORD_NAME + "," +
-//			NAME_NAME + "," +
-//			IP_NAME + "," +
-//			FIRST_ENTER_NAME + ")" +
-//			"VALUES(?,?,?,?,?)";
-//
-//		try
-//		{
-//			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
-//
-//			int counter = 0;
-//
-//			prSt.setString(++counter, playerData.uuid.toString());
-//			prSt.setString(++counter, playerData.password);
-//			prSt.setString(++counter, playerData.name);
-//			prSt.setString(++counter, playerData.ip);
-//			prSt.setString(++counter, String.valueOf(playerData.first_enter));
-//
-//			prSt.executeUpdate();
-//		} catch (Exception ex)
-//		{
-//			ex.printStackTrace();
-//		}
-//	}
+	private void registrationPlayer(PlayerData playerData)
+	{
+		String insert = "INSERT INTO " + TABLE_NAME + "(" +
+			UUID_NAME + "," +
+			PASSWORD_NAME + "," +
+			NAME_NAME + "," +
+			IP_NAME + "," +
+			FIRST_ENTER_NAME + ")" +
+			"VALUES(?,?,?,?,?)";
+
+		try
+		{
+			PreparedStatement prSt = plugin.get(DataBaseManager.class).getDbConnection().prepareStatement(insert);
+
+			int counter = 0;
+
+			prSt.setString(++counter, playerData.uuid.toString());
+			prSt.setString(++counter, playerData.password);
+			prSt.setString(++counter, playerData.name);
+			prSt.setString(++counter, playerData.ip);
+			prSt.setString(++counter, String.valueOf(playerData.first_enter));
+
+			prSt.executeUpdate();
+		} catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 }
