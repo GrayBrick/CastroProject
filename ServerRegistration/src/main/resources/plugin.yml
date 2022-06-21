@@ -1,0 +1,6 @@
+name: ServerRegistration
+version: '${project.version}'
+main: castroproject.serverregistration.ServerRegistration
+api-version: 1.19
+authors: [ _GreyBrick_ ]
+description: Server Registration
