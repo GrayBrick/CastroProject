@@ -1,0 +1,15 @@
+name: Survival
+version: '${project.version}'
+main: castroproject.survival.Survival
+api-version: 1.19
+authors: [ _GreyBrick_ ]
+description: ServerSurvival
+
+commands:
+  test: { }
+  spawn: { }
+  tpr: { }
+  home: { }
+  tpdeath: { }
+  findBiomes: { }
+  stat: { }
