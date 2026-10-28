@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 72 14% 96%;
+    --foreground: 130 15% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 130 15% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 130 15% 14%;
+    --primary: 138 30% 23%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 84 24% 93%;
+    --secondary-foreground: 138 30% 23%;
+    --muted: 80 12% 94%;
+    --muted-foreground: 110 5% 48%;
+    --accent: 84 24% 91%;
+    --accent-foreground: 138 30% 23%;
+    --destructive: 10 55% 53%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 90 13% 88%;
+    --input: 90 13% 88%;
+    --ring: 105 23% 43%;
+    --radius: 0.9rem;
+  }
+  * { @apply border-border; }
+  html { background: #e7e9e2; }
+  body { @apply bg-background text-foreground; min-width: 320px; }
+  button, a, input, select { touch-action: manipulation; }
+}

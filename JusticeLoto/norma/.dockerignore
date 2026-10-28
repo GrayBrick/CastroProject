@@ -1,0 +1,12 @@
+node_modules
+dist
+artifacts
+backups
+data
+.git
+.env
+.env.*
+!.env.example
+*.log
+*.backup
+*.dump

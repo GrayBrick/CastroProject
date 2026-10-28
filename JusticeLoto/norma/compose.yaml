@@ -1,0 +1,83 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: norma
+      POSTGRES_USER: norma
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-norma}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U norma -d norma"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgres://norma:${POSTGRES_PASSWORD:-norma}@db:5432/norma
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
+      DEV_SMS_CODE: ${DEV_SMS_CODE:-}
+      USDA_API_KEY: ${USDA_API_KEY:-}
+      MOONSHOT_API_KEY: ${MOONSHOT_API_KEY:-}
+      MOONSHOT_BASE_URL: ${MOONSHOT_BASE_URL:-https://api.moonshot.ai/v1}
+      MOONSHOT_VISION_MODEL: ${MOONSHOT_VISION_MODEL:-kimi-k3}
+      MOONSHOT_TEXT_MODEL: ${MOONSHOT_TEXT_MODEL:-kimi-k3}
+      SMS_PROVIDER_URL: ${SMS_PROVIDER_URL:-}
+      SMS_PROVIDER_TOKEN: ${SMS_PROVIDER_TOKEN:-}
+      OFF_USER_AGENT: ${OFF_USER_AGENT:-NormaNutrition/1.0}
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ./data/usda:/data/usda:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3001/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["public"]
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:
